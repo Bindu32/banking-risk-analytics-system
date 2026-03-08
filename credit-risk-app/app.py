@@ -2,8 +2,8 @@ import streamlit as st
 import joblib
 import pandas as pd
 
-model = joblib.load("credit_risk_model.pkl")
-features = joblib.load("model_features.pkl")
+model = joblib.load("credit-risk-app/credit_risk_model.pkl")
+features = joblib.load("credit-risk-app/model_features.pkl")
 
 st.title("Credit Risk Prediction")
 
