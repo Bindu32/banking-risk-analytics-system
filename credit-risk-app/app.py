@@ -3,132 +3,135 @@ import pandas as pd
 import joblib
 import matplotlib.pyplot as plt
 
+st.set_page_config(page_title="Banking Risk Analytics Platform", layout="wide")
+
 st.title("Banking Risk Analytics Platform")
 
-st.write("Upload borrower dataset to analyze portfolio credit risk")
+# Sidebar
+st.sidebar.header("Portfolio Controls")
 
-# load model
+uploaded_file = st.sidebar.file_uploader("Upload Borrower Dataset", type=["csv"])
+
 model = joblib.load("credit-risk-app/credit_risk_model.pkl")
 
-uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
-
-if uploaded_file is not None:
+if uploaded_file:
 
     data = pd.read_csv(uploaded_file)
 
-    st.subheader("Uploaded Data")
-    st.dataframe(data.head())
+    # Predict PD
+    predictions = model.predict_proba(data)[:,1]
+    data["PD"] = predictions
 
-    try:
-        # Predict PD
-        predictions = model.predict_proba(data)[:, 1]
-        data["PD"] = predictions
+    # Risk bands
+    def risk_band(pd):
+        if pd < 0.05:
+            return "Low Risk"
+        elif pd < 0.15:
+            return "Medium Risk"
+        elif pd < 0.30:
+            return "High Risk"
+        else:
+            return "Very High Risk"
 
-        # Risk band
-        def risk_band(pd):
-            if pd < 0.05:
-                return "Low Risk"
-            elif pd < 0.15:
-                return "Medium Risk"
-            elif pd < 0.30:
-                return "High Risk"
-            else:
-                return "Very High Risk"
+    data["Risk_Band"] = data["PD"].apply(risk_band)
 
-        data["Risk_Band"] = data["PD"].apply(risk_band)
+    # Credit score
+    data["Credit_Score"] = (850 - (data["PD"] * 550)).astype(int)
 
-        # Credit score
-        data["Credit_Score"] = (850 - (data["PD"] * 550)).astype(int)
+    # Expected loss
+    LGD = 0.6
+    data["Expected_Loss"] = data["PD"] * LGD * data["loan_amnt"]
 
-        # Expected loss
-        LGD = 0.6
-        data["Expected_Loss"] = data["PD"] * LGD * data["loan_amnt"]
+    # Sidebar filter
+    risk_filter = st.sidebar.multiselect(
+        "Filter Risk Bands",
+        data["Risk_Band"].unique(),
+        default=data["Risk_Band"].unique()
+    )
 
-        st.success("Predictions completed")
+    filtered = data[data["Risk_Band"].isin(risk_filter)]
 
-        st.subheader("Prediction Results")
-        st.dataframe(data.head())
+    # ---------- KPI DASHBOARD ----------
 
-        # ---------- PORTFOLIO FILTER ----------
+    avg_pd = filtered["PD"].mean()
+    total_el = filtered["Expected_Loss"].sum()
+    portfolio_size = len(filtered)
+    high_risk = (filtered["Risk_Band"] == "Very High Risk").mean()*100
 
-        st.subheader("Portfolio Filter")
+    col1,col2,col3,col4 = st.columns(4)
 
-        selected_risk = st.multiselect(
-            "Select Risk Bands",
-            options=data["Risk_Band"].unique(),
-            default=data["Risk_Band"].unique()
-        )
+    col1.metric("Portfolio Size", portfolio_size)
+    col2.metric("Average PD", f"{avg_pd:.2%}")
+    col3.metric("Total Expected Loss", f"${total_el:,.0f}")
+    col4.metric("Very High Risk %", f"{high_risk:.1f}%")
 
-        filtered_data = data[data["Risk_Band"].isin(selected_risk)]
+    st.divider()
 
-        # ---------- PORTFOLIO METRICS ----------
+    # ---------- CHARTS ----------
 
-        st.subheader("Portfolio Risk Summary")
+    colA,colB = st.columns(2)
 
-        avg_pd = filtered_data["PD"].mean()
-        total_el = filtered_data["Expected_Loss"].sum()
-        high_risk_pct = (filtered_data["Risk_Band"] == "Very High Risk").mean() * 100
-
-        col1, col2, col3 = st.columns(3)
-
-        col1.metric("Average PD", f"{avg_pd:.2%}")
-        col2.metric("Total Expected Loss", f"${total_el:,.0f}")
-        col3.metric("Very High Risk %", f"{high_risk_pct:.1f}%")
-
-        # ---------- TOP RISKY BORROWERS ----------
-
-        st.subheader("Top 20 Riskiest Borrowers")
-
-        top_risk = filtered_data.sort_values("PD", ascending=False).head(20)
-
-        st.dataframe(top_risk)
-
-        # ---------- EXPECTED LOSS BY RISK BAND ----------
-
-        st.subheader("Expected Loss by Risk Band")
-
-        loss_by_band = filtered_data.groupby("Risk_Band")["Expected_Loss"].sum()
+    with colA:
+        st.subheader("Risk Band Distribution")
 
         fig = plt.figure()
-        loss_by_band.plot(kind="bar")
-        plt.ylabel("Expected Loss")
+        filtered["Risk_Band"].value_counts().plot(kind="bar")
+        plt.ylabel("Borrowers")
 
         st.pyplot(fig)
 
-        # ---------- PD DISTRIBUTION ----------
-
+    with colB:
         st.subheader("PD Distribution")
 
         fig2 = plt.figure()
-        filtered_data["PD"].hist(bins=30)
+        filtered["PD"].hist(bins=30)
         plt.xlabel("Probability of Default")
-        plt.ylabel("Borrower Count")
 
         st.pyplot(fig2)
 
-        # ---------- STRESS TEST ----------
+    st.divider()
 
-        st.subheader("Stress Scenario (PD increases by 50%)")
+    # ---------- EXPECTED LOSS BY BAND ----------
 
-        stressed_pd = filtered_data["PD"] * 1.5
-        stressed_el = (stressed_pd * LGD * filtered_data["loan_amnt"]).sum()
+    st.subheader("Expected Loss by Risk Band")
 
-        st.metric(
-            "Stressed Expected Loss",
-            f"${stressed_el:,.0f}"
-        )
+    loss_band = filtered.groupby("Risk_Band")["Expected_Loss"].sum()
 
-        # ---------- DOWNLOAD ----------
+    fig3 = plt.figure()
+    loss_band.plot(kind="bar")
 
-        csv = filtered_data.to_csv(index=False).encode()
+    st.pyplot(fig3)
 
-        st.download_button(
-            label="Download Portfolio Results",
-            data=csv,
-            file_name="credit_risk_results.csv",
-            mime="text/csv"
-        )
+    st.divider()
 
-    except Exception as e:
-        st.error("Feature mismatch with training model")
-        st.write(e)
+    # ---------- TOP RISKY BORROWERS ----------
+
+    st.subheader("Top 20 Riskiest Borrowers")
+
+    risky = filtered.sort_values("PD",ascending=False).head(20)
+
+    st.dataframe(risky)
+
+    st.divider()
+
+    # ---------- STRESS TEST ----------
+
+    st.subheader("Stress Test Scenario")
+
+    stressed_pd = filtered["PD"]*1.5
+    stressed_loss = (stressed_pd*LGD*filtered["loan_amnt"]).sum()
+
+    st.metric("Stressed Expected Loss",f"${stressed_loss:,.0f}")
+
+    st.divider()
+
+    # ---------- DOWNLOAD ----------
+
+    csv = filtered.to_csv(index=False).encode()
+
+    st.download_button(
+        "Download Portfolio Results",
+        csv,
+        "credit_risk_results.csv",
+        "text/csv"
+    )
