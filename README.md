@@ -3,6 +3,8 @@
 
 **Project Title:** Banking Risk Analytics System – Loan Default Prediction & Risk Insights
 
+**Deployment link** https://banking-risk-analytics-system-ku5gdmzncge8mjihtfr28z.streamlit.app/
+
 **Business Problem:**  
 This project aims to build an end-to-end system that predicts loan defaults and recommends approvals or rejections based on borrower risk. The system will provide actionable insights for credit decision-makers and risk managers.
 
