@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import joblib
 
-st.title("Credit Risk Prediction System")
+st.title("Banking Risk Analytics Platform")
 
 st.write("Upload borrower dataset to predict default probability")
 
@@ -19,14 +19,39 @@ if uploaded_file is not None:
     st.dataframe(data.head())
 
     try:
-        predictions = model.predict_proba(data)[:,1]
+        # Predict probability of default
+        predictions = model.predict_proba(data)[:, 1]
 
-        data["Default_Probability"] = predictions
+        data["PD"] = predictions
+
+        # Risk band function
+        def risk_band(pd):
+            if pd < 0.05:
+                return "Low Risk"
+            elif pd < 0.15:
+                return "Medium Risk"
+            elif pd < 0.30:
+                return "High Risk"
+            else:
+                return "Very High Risk"
+
+        # Apply risk band
+        data["Risk_Band"] = data["PD"].apply(risk_band)
+
+        # Credit score transformation
+        data["Credit_Score"] = (850 - (data["PD"] * 550)).astype(int)
+
+        # Expected loss calculation
+        LGD = 0.6
+        EXPOSURE = 20000
+
+        data["Expected_Loss"] = data["PD"] * LGD * EXPOSURE
 
         st.success("Prediction Completed")
 
         st.dataframe(data.head())
 
+        # Download results
         csv = data.to_csv(index=False).encode()
 
         st.download_button(
