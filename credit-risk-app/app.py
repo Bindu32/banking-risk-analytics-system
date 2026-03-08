@@ -1,34 +1,41 @@
 import streamlit as st
-import joblib
 import pandas as pd
+import joblib
 
+st.title("Credit Risk Prediction System")
+
+st.write("Upload borrower dataset to predict default probability")
+
+# load model
 model = joblib.load("credit-risk-app/credit_risk_model.pkl")
-features = joblib.load("credit-risk-app/model_features.pkl")
 
-st.title("Credit Risk Prediction")
+uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
 
-st.write("Enter borrower details to predict default risk")
+if uploaded_file is not None:
 
-loan_amnt = st.number_input("Loan Amount", 1000, 50000, 10000)
-annual_inc = st.number_input("Annual Income", 10000, 200000, 50000)
-dti = st.number_input("Debt-to-Income Ratio", 0.0, 50.0, 10.0)
-fico = st.number_input("FICO Score", 300, 850, 700)
+    data = pd.read_csv(uploaded_file)
 
-input_data = pd.DataFrame(
-[[loan_amnt, annual_inc, dti, fico]],
-columns=["loan_amnt","annual_inc","dti","fico"]
-)
+    st.write("Uploaded Data Preview")
+    st.dataframe(data.head())
 
-if st.button("Predict"):
+    try:
+        predictions = model.predict_proba(data)[:,1]
 
-    prob = model.predict_proba(input_data)[0][1]
+        data["Default_Probability"] = predictions
 
-    if prob < 0.1:
-        risk = "Low Risk"
-    elif prob < 0.2:
-        risk = "Medium Risk"
-    else:
-        risk = "High Risk"
+        st.success("Prediction Completed")
 
-    st.write("Default Probability:", round(prob,3))
-    st.write("Risk Category:", risk)
+        st.dataframe(data.head())
+
+        csv = data.to_csv(index=False).encode()
+
+        st.download_button(
+            label="Download Predictions",
+            data=csv,
+            file_name="credit_risk_predictions.csv",
+            mime="text/csv"
+        )
+
+    except Exception as e:
+        st.error("Feature mismatch with training model")
+        st.write(e)
