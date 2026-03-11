@@ -36,6 +36,7 @@ Bank executives, credit risk managers, and lending decision-makers.
 - Improve overall portfolio risk management
 
 ## System Architecture
+```
 Borrower Dataset
       │
       ▼
@@ -52,7 +53,10 @@ Risk Metrics Engine
       ├── Streamlit Risk Platform
       │
       └── Power BI Portfolio Dashboard
+```
 
+### Dataset
+[https://www.kaggle.com/datasets/wordsforthewise/lending-club]
 
 
 ### Step 1: Data Cleaning
