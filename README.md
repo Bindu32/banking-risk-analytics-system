@@ -207,6 +207,9 @@ Displays portfolio-level metrics such as:
 - Total expected portfolio loss
 - Overall risk segmentation
 
+  <img width="1393" height="788" alt="Screenshot 2026-03-11 064940" src="https://github.com/user-attachments/assets/9055fe60-687d-4972-a7aa-71d7730e7db7" />
+
+
 ### Model Explainability
 
 Uses SHAP explainability techniques to identify:
@@ -257,7 +260,7 @@ streamlit run app.py
 
 4. Open the Dashboard
 - The application will open in your browser.
-- Upload a borrower dataset to generate predictions and portfolio analytics. - sample dataset
+- Upload a borrower dataset to generate predictions and portfolio analytics. - sample credt input
 
 ## Applications
 This project demonstrates how machine learning can support:
