@@ -4,7 +4,7 @@ import numpy as np
 import joblib
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-import seaborn as sns
+import matplotlib.colors as mcolors
 import shap
 import os
 import io
@@ -609,14 +609,22 @@ numeric_cols = [c for c in ["loan_amnt","int_rate","annual_inc","dti","PD","Cred
 if len(numeric_cols) >= 3:
     corr = filtered[numeric_cols].corr()
     fig_hm, ax_hm = plt.subplots(figsize=(9, 5))
-    sns.heatmap(corr, annot=True, fmt=".2f", cmap="RdYlGn_r",
-                linewidths=0.5, linecolor='#0a0e1a',
-                ax=ax_hm, annot_kws={"size": 8},
-                cbar_kws={"shrink": 0.7})
+    cmap = plt.cm.RdYlGn_r
+    im = ax_hm.imshow(corr.values, cmap=cmap, vmin=-1, vmax=1, aspect='auto')
+    ax_hm.set_xticks(range(len(corr.columns)))
+    ax_hm.set_yticks(range(len(corr.columns)))
+    ax_hm.set_xticklabels(corr.columns, rotation=35, ha='right', fontsize=8, color='#94a3b8')
+    ax_hm.set_yticklabels(corr.columns, fontsize=8, color='#94a3b8')
+    for i in range(len(corr.columns)):
+        for j in range(len(corr.columns)):
+            val = corr.values[i, j]
+            ax_hm.text(j, i, f"{val:.2f}", ha='center', va='center',
+                       fontsize=7.5, color='white' if abs(val) > 0.5 else '#e2e8f0')
+    cbar = fig_hm.colorbar(im, ax=ax_hm, shrink=0.7)
+    cbar.ax.tick_params(colors='#94a3b8', labelsize=7)
     ax_hm.set_facecolor('#0d1526')
     fig_hm.patch.set_facecolor('#0a0e1a')
-    ax_hm.tick_params(colors='#94a3b8', labelsize=8)
-    plt.title("Feature Correlation Matrix", color='#e2e8f0', fontsize=11, pad=12)
+    ax_hm.set_title("Feature Correlation Matrix", color='#e2e8f0', fontsize=11, pad=12)
     plt.tight_layout()
     st.pyplot(fig_hm)
 else:
