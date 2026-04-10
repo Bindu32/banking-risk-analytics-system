@@ -284,7 +284,7 @@ with st.sidebar:
     raw_data = None
 
     if data_source == "📄 Use Sample Dataset":
-        SAMPLE_PATH = "sample_credit_input.csv"
+        SAMPLE_PATH = "data/sample_credit_input.csv"
         if os.path.exists(SAMPLE_PATH):
             raw_data = pd.read_csv(SAMPLE_PATH)
             st.info(f"✅ Loaded `{SAMPLE_PATH}` — **{len(raw_data):,}** records")
