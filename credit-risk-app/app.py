@@ -7,7 +7,6 @@ import matplotlib.patches as mpatches
 import matplotlib.colors as mcolors
 import shap
 import os
-import io
 from datetime import datetime
 
 # ─────────────────────────── PAGE CONFIG ───────────────────────────
