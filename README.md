@@ -128,8 +128,6 @@ The project tracks business-critical credit risk KPIs:
 
 These KPIs were chosen because they align closely with underwriting decisions, loss forecasting, and executive reporting needs.
 
-<img width="1806" height="489" alt="Screenshot 2026-04-10 152005" src="https://github.com/user-attachments/assets/aa75712d-0657-4a29-8374-1732465746b6" />
-
 
 ### Analytical techniques
 
