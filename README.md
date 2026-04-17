@@ -76,7 +76,8 @@ The solution follows a layered analytics pipeline that converts borrower data in
 6. **Analytics Delivery Layer**  
    Outputs are delivered through a Streamlit application for interactive borrower and scenario analysis, and through Power BI for portfolio-level visualization.
 
-![Solution Architecture](path/to/architecture_diagram.png)
+<img width="1376" height="768" alt="generated-image" src="https://github.com/user-attachments/assets/ed157eb6-d7d0-4bcc-abe5-92f21b86ace7" />
+
 
 **Add this image as the architecture diagram showing the full workflow: borrower dataset → preprocessing → ML model → risk metrics engine → Streamlit app / Power BI dashboard.**
 
@@ -126,6 +127,9 @@ The project tracks business-critical credit risk KPIs:
 - **Approval Action by Risk Band** = recommended lending action per borrower category
 
 These KPIs were chosen because they align closely with underwriting decisions, loss forecasting, and executive reporting needs.
+
+<img width="1806" height="489" alt="Screenshot 2026-04-10 152005" src="https://github.com/user-attachments/assets/aa75712d-0657-4a29-8374-1732465746b6" />
+
 
 ### Analytical techniques
 
@@ -184,11 +188,8 @@ For banks and NBFC-style lending environments, this can contribute to lower non-
 
 **Deployed Application:** [Open Live Streamlit App](https://banking-risk-analytics-system-ku5gdmzncge8mjihtfr28z.streamlit.app/)
 
-![Dashboard Overview](path/to/dashboard1.png)
+<img width="1393" height="788" alt="Screenshot 2026-03-11 064940" src="https://github.com/user-attachments/assets/c570c4c0-f328-4885-a78a-afebe74be70b" />
 
-**Add this screenshot as the main dashboard homepage showing portfolio KPIs such as portfolio size, average PD, total exposure, total expected loss, and very high-risk percentage.**
-
-![Detailed View](path/to/dashboard2.png)
 
 **Add this screenshot as a detailed analytics view showing scenario analysis, SHAP explainability, risk distribution, or expected loss visuals.**
 
@@ -260,20 +261,6 @@ streamlit run app.py
 
 Then open the local application in your browser, or use the deployed version here:  
 **[https://banking-risk-analytics-system-ku5gdmzncge8mjihtfr28z.streamlit.app/](https://banking-risk-analytics-system-ku5gdmzncge8mjihtfr28z.streamlit.app/)**
-
----
-
-## Suggested Image Placement Guide
-
-Use the following screenshots / visuals in the repository:
-
-| Image Placeholder | What it should show | Suggested Location |
-|---|---|---|
-| `![Solution Architecture](path/to/architecture_diagram.png)` | End-to-end system workflow | `assets/architecture_diagram.png` |
-| `![Dashboard Overview](path/to/dashboard1.png)` | Main portfolio summary dashboard | `assets/dashboard_overview.png` |
-| `![Detailed View](path/to/dashboard2.png)` | Scenario analysis / explainability / risk detail | `assets/detailed_view.png` |
-| `![Expected Loss Analysis](path/to/el_analysis.png)` | EL by risk band / exposure vs EL | `assets/expected_loss_analysis.png` |
-| `![Model Explainability](path/to/shap_view.png)` | SHAP summary or local explanation | `assets/shap_explainability.png` |
 
 ---
 
